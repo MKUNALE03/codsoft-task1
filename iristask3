@@ -1,0 +1,65 @@
+import pandas as pd
+import numpy as np
+iris = pd.read_csv(r"D:\Downnloads\IRIS.csv")
+
+iris.head()
+iris.info()
+iris.describe()
+iris.value_counts()
+iris.count()
+iris['species'].value_counts()
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+sns.set()
+sns.countplot(x = 'species', data = iris,  )
+iris['species'].value_counts().plot(kind='barh', color=['red','green','yellow'], title='species count')
+
+sns.swarmplot(x= 'species', y='petal_length', data = iris)
+sns.scatterplot(x ='sepal_length', y = 'sepal_width', hue ='species', data = iris)
+iris.replace({'species':{'Iris-setosa':0, 'Iris-versicolor':1, 'Iris-virginica':2}}, inplace = True)
+from sklearn.model_selection import train_test_split
+x = iris.drop(columns='species', axis= 1 )
+y = iris['species']
+x_train, x_test, y_train, y_test = train_test_split(x,y, test_size=0.25, random_state=4)
+
+from sklearn.linear_model import LogisticRegression
+LR = LogisticRegression()
+LR.fit(x_train,y_train)
+from sklearn.metrics import accuracy_score, precision_score, recall_score, classification_report 
+
+
+y_pred = LR.predict(x_test)
+acc_LR = accuracy_score(y_pred, y_test)
+print(acc_LR)
+
+from sklearn import metrics
+score = round(LR.score(x_test, y_test)*100,2)
+cls_report = classification_report(y_pred, y_test)
+
+
+print('accuracy score for the logistic regression model is:', score)
+
+print('classification report for our model is:', cls_report)
+
+from sklearn.svm import SVC
+
+svc = SVC()
+svc.fit(x_train,y_train)
+
+y_pred_svc = svc.predict(x_test)
+acc_svc = accuracy_score(y_pred_svc,y_test)
+score_svc = round(svc.score(x_test, y_test)*100,2)
+score_svc
+cls_svc = classification_report(y_pred_svc, y_test)
+
+print('accuracy score of svc model is :', acc_svc)
+print('classification report of svc model is:', cls_svc)
+
+# predicting values from the dataset
+print(x)
+print(y)
+
+
+LR.predict([[6.7, 3.0, 5.2, 2.3]])
+svc.predict([[6.7, 3.0, 5.2, 2.3]])
