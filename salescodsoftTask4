@@ -1,0 +1,85 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+ad_expense_data = pd.read_csv(r'sales.csv')
+ad_expense_data.tail()
+ad_expense_data.shape
+
+ad_expense_data.describe()
+ad_expense_data.isnull().sum()
+
+fig, axs = plt.subplots(3, figsize = (5,5))
+plt1 = sns.boxplot(x = ad_expense_data['TV'], ax=axs[0], notch=True, showcaps=False,
+    flierprops={"marker": "x"},
+    boxprops={"facecolor": (.4, .6, .8, .5)},
+    medianprops={"color": "red"})
+plt2 = sns.boxplot(x = ad_expense_data['Radio'],ax=axs[1], notch=True, showcaps=False,
+    flierprops={"marker": "x"},
+    boxprops={"facecolor": (.4, .6, .8, .3)},
+    medianprops={"color": "red"})
+plt3 = sns.boxplot(x = ad_expense_data['Newspaper'],ax=axs[2], notch=True, showcaps=False,
+    flierprops={"marker": "x"},
+    boxprops={"facecolor": (.4, .6, .8, .2)},
+    medianprops={"color": "red"})
+
+
+sns.boxplot(x= ad_expense_data['Sales'],  notch = True, showcaps=False,
+    flierprops={"marker": "x"},
+    boxprops={"facecolor": (.4, .6, .8, .5)},
+    medianprops={"color": "coral"})
+plt.show()
+
+corr = ad_expense_data.corr()
+sns.heatmap(corr, annot= True, cmap = 'summer')
+plt.show()
+sns.pairplot(ad_expense_data, x_vars = ['TV','Radio','Newspaper'], y_vars=['Sales'], kind = 'scatter', aspect = 1, height = 4)
+
+sns.pairplot(ad_expense_data, kind = 'scatter', aspect = 1, height = 4, palette = 'hls', hue='Sales')
+x = ad_expense_data['TV']
+y = ad_expense_data['Sales']
+
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(x, y, train_size = 0.7, test_size = 0.3, random_state = 120)
+print(x_train.head())
+print(y_train.head())
+
+import statsmodels.api as sm
+x_train_sm = sm.add_constant(x_train)
+lr = sm.OLS(y_train, x_train_sm).fit()
+lr.params
+print(lr.summary())
+
+
+plt.scatter(x_train, y_train)
+plt.plot(x_train, 6.57 + 0.058*x_train, 'r')
+plt.show()
+plt.figure(figsize=(20,20))
+
+y_train_pred = lr.predict(x_train_sm)
+res = (y_train - y_train_pred)
+
+fig = plt.figure()
+sns.distplot(res, bins = 15, color = 'green')
+fig.suptitle('Errors', fontsize = 15)                   
+plt.xlabel('y_train - y_train_pred', fontsize = 15)         
+plt.show()
+
+plt.scatter(x_train,res, c= 'red' )
+plt.show()
+
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import r2_score
+np.sqrt(mean_squared_error(y_test, y_pred))
+r_squared = r2_score(y_test, y_pred)
+r_squared
+
+plt.scatter(x_test, y_test)
+plt.plot(x_test, 6.57 + 0.058 * x_test, 'r')
+plt.show()
+
+x_test_sm = sm.add_constant(x_test)
+
+
+y_pred = lr.predict(x_test_sm)
+y_pred.head()
